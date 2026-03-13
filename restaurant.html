@@ -1,0 +1,886 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>'>
+  <title>SliceFinder – Restaurant</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alfa%20Slab%20One">
+  <style>
+    html, body { margin: 0; padding: 0; font-family: Tahoma, sans-serif; background: #f5f5f5; overflow-x: hidden; }
+
+    /* ── Navbar ── */
+    .navbar { margin-bottom: 0; border-radius: 0; width: 100%; }
+    .navbar-brand { font-family: 'Alfa Slab One', serif; color: #c0392b !important; font-size: 24px; letter-spacing: 1px; }
+    @media (max-width: 767px) {
+      #bs-navbar { display: none; width: 100%; }
+      #bs-navbar.open { display: block; }
+      #bs-navbar .nav > li > a { color: #fff !important; padding: 10px 16px; }
+      #bs-navbar .nav > li > a:hover { background: #333 !important; }
+      #nav-toggle { display: block !important; }
+    }
+    @media (min-width: 768px) {
+      #bs-navbar { display: block !important; }
+      #nav-toggle { display: none !important; }
+    }
+
+    /* ── Layout ── */
+    .page-container { max-width: 900px; margin: 30px auto; padding: 0 16px 40px; }
+
+    /* ── Hero ── */
+    .restaurant-hero {
+      background: #222;
+      color: #fff;
+      border-radius: 8px 8px 0 0;
+      padding: 28px 28px 20px;
+      position: relative;
+    }
+    .restaurant-hero h1 {
+      font-family: 'Alfa Slab One', serif;
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: #fff;
+    }
+    .back-link {
+      font-size: 12px;
+      color: #aaa;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .back-link:hover { color: #fff; }
+
+    /* ── Detail card ── */
+    .detail-card {
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+
+    .info-item label {
+      display: block;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      margin-bottom: 2px;
+    }
+    .info-item span, .info-item a {
+      font-size: 14px;
+      color: #333;
+    }
+    .info-item a { color: #c0392b; text-decoration: none; }
+    .info-item a:hover { text-decoration: underline; }
+
+    /* ── Tags ── */
+    .tag-chip {
+      display: inline-block;
+      background: #f0e6e6;
+      color: #c0392b;
+      border-radius: 12px;
+      padding: 3px 12px;
+      font-size: 12px;
+      margin: 3px 3px 3px 0;
+    }
+
+    /* ── Map ── */
+    #detail-map {
+      width: 100%;
+      height: 280px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 24px;
+      background: #eee;
+    }
+    .map-fallback {
+      width: 100%;
+      height: 280px;
+      border-radius: 6px;
+      border: 0;
+      display: block;
+      margin-bottom: 24px;
+    }
+
+    /* ── Section headers ── */
+    .section-title {
+      font-family: 'Alfa Slab One', serif;
+      color: #c0392b;
+      font-size: 18px;
+      margin: 0 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #f0e6e6;
+    }
+
+    /* ── Photos ── */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .photo-grid .photo-slot {
+      height: 120px;
+      background: #f0e6e6;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #c0392b;
+      font-size: 28px;
+      border: 2px dashed #e0c8c8;
+    }
+    .photo-grid img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    /* ── Reviews ── */
+    .review-card {
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      background: #fafafa;
+    }
+    .review-card .reviewer {
+      font-weight: bold;
+      font-size: 13px;
+      color: #333;
+    }
+    .review-header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+    .review-avatar {
+      width:34px; height:34px; border-radius:50%;
+      background:#c0392b; display:flex; align-items:center;
+      justify-content:center; font-size:14px; font-weight:bold;
+      color:#fff; flex-shrink:0; overflow:hidden; border:2px solid #eee;
+    }
+    .review-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .review-card .review-date {
+      font-size: 11px;
+      color: #aaa;
+      margin-left: 8px;
+    }
+    .review-card .review-text {
+      font-size: 13px;
+      color: #555;
+      margin: 6px 0 0;
+    }
+    .stars { color: #e67e22; font-size: 15px; letter-spacing: 1px; }
+    .stars-empty { color: #ddd; }
+
+    /* ── Write review form ── */
+    .review-form-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .review-form-card h4 {
+      font-family: 'Alfa Slab One', serif;
+      color: #c0392b;
+      font-size: 16px;
+      margin: 0 0 14px;
+    }
+    .star-picker { font-size: 28px; cursor: pointer; letter-spacing: 4px; user-select: none; }
+    .star-picker span { color: #ddd; transition: color 0.1s; }
+    .star-picker span.on { color: #e67e22; }
+
+    /* ── Admin controls ── */
+    #admin-bar {
+      display: none;
+      background: #2c3e50;
+      padding: 8px 16px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    #admin-bar span { color: #aaa; font-size: 12px; }
+    .admin-btn { font-size: 12px; padding: 4px 12px; }
+
+    /* Edit modal */
+    #edit-modal {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+      overflow-y: auto;
+    }
+    #edit-modal-inner {
+      background: #fff;
+      max-width: 640px;
+      margin: 40px auto;
+      border-radius: 8px;
+      padding: 28px;
+    }
+    #edit-modal-inner h4 {
+      font-family: 'Alfa Slab One', serif;
+      color: #c0392b;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .edit-section-label {
+      font-size: 11px; font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; color: #999; margin: 16px 0 6px;
+      border-bottom: 1px solid #eee; padding-bottom: 4px;
+    }
+
+    /* ── Loading/error states ── */
+    #loading { text-align: center; padding: 60px 0; color: #888; font-size: 18px; }
+    #error-msg { display: none; text-align: center; padding: 60px 0; color: #c0392b; }
+
+    footer { background: #555; color: #fff; padding: 15px; text-align: center; margin-top: 20px; }
+    footer p { margin: 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid" style="padding:0 10px;">
+      <div class="navbar-header">
+        <button id="nav-toggle" type="button" class="navbar-toggle" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="sf-staging.html">SliceFinder</a>
+      </div>
+      <div id="bs-navbar">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="sf-staging.html">Restaurants</a></li>
+          <li><a href="#">Frozen Pizza</a></li>
+          <li><a href="#">Pizza News</a></li>
+          <li><a href="#">My Profile</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="profile.html" id="nav-auth-btn">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="loading">🍕 Loading restaurant…</div>
+  <div id="error-msg"><h3>Restaurant not found.</h3><a href="sf-staging.html">← Back to map</a></div>
+
+  <div id="page-content" style="display:none;">
+    <div class="page-container">
+
+      <!-- Hero + Detail Card -->
+      <div class="restaurant-hero">
+        <a href="sf-staging.html" class="back-link">← Back to map</a>
+        <!-- Admin bar — only shown to admins -->
+        <div id="admin-bar">
+          <span>⚙️ Admin</span>
+          <button class="btn btn-warning btn-sm admin-btn" onclick="openEditModal()">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm admin-btn" onclick="confirmDelete()">🗑 Delete</button>
+        </div>
+        <h1 id="r-name"></h1>
+        <div id="r-avg-rating" style="margin-bottom:8px; font-size:15px; color:#f0a500; min-height:20px;"></div>
+        <div id="r-tags"></div>
+        <div style="margin-top:12px;">
+          <button id="fav-btn" onclick="toggleFavorite()" class="btn btn-sm" style="background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3);">
+            ❤️ Save as Favorite
+          </button>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Address</label>
+            <span id="r-address"></span>
+          </div>
+          <div class="info-item">
+            <label>Phone</label>
+            <span id="r-phone"></span>
+          </div>
+          <div class="info-item">
+            <label>Hours</label>
+            <span id="r-hours"></span>
+          </div>
+          <div class="info-item">
+            <label>Website</label>
+            <a id="r-url" href="#" target="_blank" rel="noopener"></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="section-title">📍 Location</div>
+      <div id="detail-map"></div>
+
+      <!-- Photos -->
+      <div class="section-title">📸 Photos</div>
+      <div class="photo-grid" id="photo-grid">
+        <!-- placeholder slots -->
+        <div class="photo-slot">🍕</div>
+        <div class="photo-slot">🍕</div>
+        <div class="photo-slot">🍕</div>
+        <div class="photo-slot" style="font-size:13px; color:#c0392b;">+ Add photo<br><span style="font-size:10px;">(coming soon)</span></div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="section-title">⭐ Reviews</div>
+      <div id="reviews-list">
+        <p style="color:#aaa; font-size:13px;">No reviews yet. Be the first!</p>
+      </div>
+
+      <!-- Write a Review -->
+      <div class="review-form-card">
+        <h4>✍️ Write a Review</h4>
+
+        <!-- Logged out state -->
+        <div id="review-login-prompt" style="display:none; text-align:center; padding:16px 0;">
+          <p style="color:#888; font-size:13px; margin-bottom:12px;">You must be signed in to write a review.</p>
+          <a href="profile.html" class="btn btn-danger btn-sm">Sign In / Create Account</a>
+        </div>
+
+        <!-- Logged in state -->
+        <div id="review-form-inner" style="display:none;">
+          <div class="form-group">
+            <label style="font-size:13px;">Reviewing as: <strong id="rv-username-display" style="color:#c0392b;"></strong></label>
+          </div>
+          <div class="form-group">
+            <label style="font-size:13px;">Rating</label><br>
+            <div class="star-picker" id="star-picker">
+              <span data-val="1">★</span>
+              <span data-val="2">★</span>
+              <span data-val="3">★</span>
+              <span data-val="4">★</span>
+              <span data-val="5">★</span>
+            </div>
+            <input type="hidden" id="rv-rating" value="0">
+          </div>
+          <div class="form-group">
+            <label style="font-size:13px;">Review</label>
+            <textarea id="rv-text" class="form-control" rows="3" placeholder="What did you think of the pizza?"></textarea>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="submitReview()">Submit Review</button>
+          <span id="review-status" style="margin-left:10px; font-size:13px;"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Edit Restaurant Modal -->
+  <div id="edit-modal">
+    <div id="edit-modal-inner">
+      <h4>✏️ Edit Restaurant</h4>
+      <div class="edit-section-label">Restaurant Info</div>
+      <div class="form-group">
+        <label style="font-size:13px;">Name <span style="color:#c0392b">*</span></label>
+        <input type="text" id="edit-name" class="form-control input-sm">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;">Phone</label>
+        <input type="text" id="edit-phone" class="form-control input-sm">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;">Hours</label>
+        <input type="text" id="edit-hours" class="form-control input-sm">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;">Website</label>
+        <input type="url" id="edit-url" class="form-control input-sm">
+      </div>
+      <div class="edit-section-label">Location</div>
+      <div class="form-group">
+        <label style="font-size:13px;">Address</label>
+        <input type="text" id="edit-address" class="form-control input-sm">
+      </div>
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label style="font-size:13px;">City</label>
+            <input type="text" id="edit-city" class="form-control input-sm">
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label style="font-size:13px;">State</label>
+            <input type="text" id="edit-state" class="form-control input-sm" maxlength="2">
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label style="font-size:13px;">ZIP</label>
+            <input type="text" id="edit-zip" class="form-control input-sm" maxlength="10">
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px; display:flex; gap:8px; align-items:center;">
+        <button class="btn btn-danger btn-sm" onclick="saveEdit()">Save Changes</button>
+        <button class="btn btn-default btn-sm" onclick="closeEditModal()">Cancel</button>
+        <span id="edit-status" style="font-size:13px; font-weight:bold;"></span>
+      </div>
+    </div>
+  </div>
+
+  <footer><p>SliceFinder &copy;2026</p></footer>
+
+  <!-- Firebase config stored in sessionStorage from previous pages; or prompt inline -->
+  <script type="module">
+    // ── Helpers ──────────────────────────────────────────────────────────
+    function parseConfig(raw) {
+      let s = raw.trim();
+      s = s.replace(/^(const|let|var)\s+\w+\s*=\s*/, '').replace(/;?\s*$/, '');
+      s = s.replace(/([{,]\s*)([a-zA-Z_]\w*)\s*:/g, '$1"$2":');
+      s = s.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
+      return JSON.parse(s);
+    }
+
+    function stars(n, total = 5) {
+      return '★'.repeat(n) + '☆'.repeat(total - n);
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '';
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    // ── Init Firebase ─────────────────────────────────────────────────
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js');
+    const { getFirestore, doc, getDoc, collection, query, where, orderBy, addDoc, serverTimestamp, getDocs, updateDoc, deleteDoc, arrayUnion, arrayRemove }
+      = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js');
+    const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js');
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-5Bz4rpHehUbxX7kP__-ap0xSuSdwZ0E",
+      authDomain: "slicefinder-afd7f.firebaseapp.com",
+      projectId: "slicefinder-afd7f",
+      storageBucket: "slicefinder-afd7f.firebasestorage.app",
+      messagingSenderId: "103165329059",
+      appId: "1:103165329059:web:721f516c20d701ebe98916"
+    };
+
+    const apps = getApps();
+    const app = apps.length ? apps[0] : initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // ── Get restaurant ID from URL ────────────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const restaurantId = params.get('id');
+    if (!restaurantId) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error-msg').style.display = 'block';
+      throw new Error('No id param');
+    }
+
+    // ── Load restaurant ───────────────────────────────────────────────
+    const snap = await getDoc(doc(db, 'restaurants', restaurantId));
+    if (!snap.exists()) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error-msg').style.display = 'block';
+      throw new Error('Not found');
+    }
+
+    const r = snap.data();
+
+    // ── Populate page ─────────────────────────────────────────────────
+    document.title = r.name + ' – SliceFinder';
+    document.getElementById('r-name').textContent = r.name;
+    restaurantData = r; // store for edit form
+
+    const fullAddress = [r.address, r.city, r.state, r.zip].filter(Boolean).join(', ');
+    document.getElementById('r-address').textContent = fullAddress || '—';
+    document.getElementById('r-phone').textContent = r.phone || '—';
+    document.getElementById('r-hours').textContent = r.hours || '—';
+
+    const urlEl = document.getElementById('r-url');
+    if (r.url) { urlEl.href = r.url; urlEl.textContent = r.url.replace(/^https?:\/\//, ''); }
+    else { urlEl.parentElement.style.display = 'none'; }
+
+    // Tags
+    const tagsEl = document.getElementById('r-tags');
+    if (r.tags && r.tags.length) {
+      tagsEl.innerHTML = r.tags.map(t => `<span class="tag-chip">${t}</span>`).join('');
+    }
+
+    // ── Map ───────────────────────────────────────────────────────────
+    const mapEl = document.getElementById('detail-map');
+    if (r.lat && r.lng) {
+      // Use embed map (no API key needed); JS API map shown if key available
+      const embedSrc = `https://maps.google.com/maps?q=${r.lat},${r.lng}&t=m&z=16&output=embed&markers=${r.lat},${r.lng}`;
+      mapEl.outerHTML = `<iframe src="${embedSrc}" class="map-fallback" style="height:280px; margin-bottom:24px; border-radius:6px; border:1px solid #e0e0e0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    } else {
+      const addr = encodeURIComponent(fullAddress);
+      const embedSrc = `https://maps.google.com/maps?q=${addr}&t=m&z=15&output=embed`;
+      mapEl.outerHTML = `<iframe src="${embedSrc}" class="map-fallback" style="height:280px; margin-bottom:24px; border-radius:6px; border:1px solid #e0e0e0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    }
+
+    // ── Show page ─────────────────────────────────────────────────────
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('page-content').style.display = 'block';
+
+    // ── Load reviews ──────────────────────────────────────────────────
+    async function loadReviews() {
+      const listEl = document.getElementById('reviews-list');
+      let reviewSnaps;
+
+      try {
+        // Try with orderBy first (requires composite index)
+        const q = query(
+          collection(db, 'reviews'),
+          where('restaurantId', '==', restaurantId),
+          orderBy('createdAt', 'desc')
+        );
+        reviewSnaps = await getDocs(q);
+      } catch(e) {
+        // Index not yet created — fall back to simple query, sort client-side
+        console.warn('Falling back to unordered query (create index for better perf):', e.message);
+        try {
+          const q2 = query(
+            collection(db, 'reviews'),
+            where('restaurantId', '==', restaurantId)
+          );
+          reviewSnaps = await getDocs(q2);
+        } catch(e2) {
+          listEl.innerHTML = `<p style="color:red; font-size:13px;">Could not load reviews: ${e2.message}</p>`;
+          return;
+        }
+      }
+
+      if (reviewSnaps.empty) {
+        listEl.innerHTML = '<p style="color:#aaa; font-size:13px;">No reviews yet. Be the first!</p>';
+        document.getElementById('r-avg-rating').textContent = '';
+        return;
+      }
+
+      // Sort client-side by createdAt descending
+      const docs = [];
+      reviewSnaps.forEach(s => docs.push(s.data()));
+      docs.sort((a, b) => {
+        const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return tb - ta;
+      });
+
+      // Average rating
+      const rated = docs.filter(rv => rv.rating);
+      if (rated.length) {
+        const avg = rated.reduce((sum, rv) => sum + rv.rating, 0) / rated.length;
+        const avgRounded = Math.round(avg * 10) / 10;
+        const fullStars = Math.round(avg);
+        const starStr = '\u2605'.repeat(fullStars) + '\u2606'.repeat(5 - fullStars);
+        document.getElementById('r-avg-rating').innerHTML =
+          `<span style="color:#f0a500; font-size:18px; letter-spacing:2px;">${starStr}</span>` +
+          `<span style="color:#fff; font-size:13px; margin-left:8px;">${avgRounded} / 5 &nbsp;&middot;&nbsp; ${rated.length} review${rated.length !== 1 ? 's' : ''}</span>`;
+      }
+
+      // Fetch avatars for all reviewers who have a uid
+      const avatarCache = {};
+      const uids = [...new Set(docs.filter(rv => rv.uid).map(rv => rv.uid))];
+      await Promise.all(uids.map(async (uid) => {
+        try {
+          const uSnap = await getDoc(doc(db, 'users', uid));
+          if (uSnap.exists()) {
+            avatarCache[uid] = uSnap.data().photoURL || null;
+          }
+        } catch(e) {}
+      }));
+
+      listEl.innerHTML = '';
+      docs.forEach(rv => {
+        const photoURL = rv.uid ? avatarCache[rv.uid] : null;
+        const initials = (rv.username || 'A').charAt(0).toUpperCase();
+        const avatarHtml = photoURL
+          ? `<div class="review-avatar"><img src="${photoURL}" alt="${initials}"></div>`
+          : `<div class="review-avatar">${initials}</div>`;
+
+        const nameLink = rv.uid
+          ? `<a class="reviewer" href="profile.html?user=${rv.uid}" style="color:#c0392b; text-decoration:none;">${rv.username || 'Anonymous'}</a>`
+          : `<span class="reviewer">${rv.username || 'Anonymous'}</span>`;
+
+        const div = document.createElement('div');
+        div.className = 'review-card';
+        div.innerHTML = `
+          <div class="review-header">
+            ${avatarHtml}
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                ${nameLink}
+                <span class="stars">${stars(rv.rating || 0)}</span>
+              </div>
+              <span class="review-date">${formatDate(rv.createdAt)}</span>
+            </div>
+          </div>
+          <div class="review-text">${rv.text || ''}</div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    await loadReviews();
+
+    // ── Auth state: show/hide review form ────────────────────────────
+    let currentUser = null;
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      const loginPrompt = document.getElementById('review-login-prompt');
+      const formInner   = document.getElementById('review-form-inner');
+      const navBtn      = document.getElementById('nav-auth-btn');
+      if (user) {
+        loginPrompt.style.display = 'none';
+        formInner.style.display = 'block';
+        const displayName = user.displayName || user.email.split('@')[0];
+        document.getElementById('rv-username-display').textContent = displayName;
+        if (navBtn) { navBtn.textContent = 'My Profile'; navBtn.href = 'profile.html'; }
+        // Check admin status
+        await checkAdmin(user);
+        // Check if already favorited
+        try {
+          const userSnap = await getDoc(doc(db, 'users', user.uid));
+          if (userSnap.exists()) {
+            const favs = userSnap.data().favorites || [];
+            if (favs.includes(restaurantId)) setFavBtn(true);
+          }
+        } catch(e) {}
+      } else {
+        loginPrompt.style.display = 'block';
+        formInner.style.display = 'none';
+        if (navBtn) { navBtn.textContent = 'Login'; navBtn.href = 'profile.html'; }
+      }
+    });
+
+    // ── Favorite toggle ───────────────────────────────────────────────
+    function setFavBtn(isFav) {
+      const btn = document.getElementById('fav-btn');
+      btn.textContent = isFav ? '❤️ Favorited' : '❤️ Save as Favorite';
+      btn.style.background = isFav ? 'rgba(192,57,43,0.6)' : 'rgba(255,255,255,0.15)';
+      btn.dataset.faved = isFav ? '1' : '0';
+    }
+
+    window.toggleFavorite = async function() {
+      if (!currentUser) { window.location.href = 'profile.html'; return; }
+      const isFaved = document.getElementById('fav-btn').dataset.faved === '1';
+      try {
+        const userRef = doc(db, 'users', currentUser.uid);
+        if (isFaved) {
+          await updateDoc(userRef, { favorites: arrayRemove(restaurantId) });
+          setFavBtn(false);
+        } else {
+          await updateDoc(userRef, { favorites: arrayUnion(restaurantId) }).catch(async () => {
+            // user doc might not exist yet
+            const { setDoc } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js');
+            await setDoc(userRef, { favorites: [restaurantId] }, { merge: true });
+          });
+          setFavBtn(true);
+        }
+      } catch(e) { console.error('Favorite error:', e); }
+    };
+
+    // ── Star picker ───────────────────────────────────────────────────
+    let selectedRating = 0;
+    const starSpans = document.querySelectorAll('#star-picker span');
+
+    starSpans.forEach(s => {
+      s.addEventListener('mouseover', () => highlightStars(+s.dataset.val));
+      s.addEventListener('mouseout',  () => highlightStars(selectedRating));
+      s.addEventListener('click', () => {
+        selectedRating = +s.dataset.val;
+        document.getElementById('rv-rating').value = selectedRating;
+        highlightStars(selectedRating);
+      });
+    });
+
+    function highlightStars(n) {
+      starSpans.forEach(s => s.classList.toggle('on', +s.dataset.val <= n));
+    }
+
+    // ── Submit review ─────────────────────────────────────────────────
+    window.submitReview = async function() {
+      const statusEl = document.getElementById('review-status');
+      if (!currentUser) { statusEl.textContent = '❌ Please sign in to review.'; statusEl.style.color='red'; return; }
+      const username = currentUser.displayName || currentUser.email.split('@')[0];
+      const rating   = +document.getElementById('rv-rating').value;
+      const text     = document.getElementById('rv-text').value.trim();
+
+      if (!rating)   { statusEl.textContent = '❌ Please select a star rating.'; statusEl.style.color='red'; return; }
+      if (!text)     { statusEl.textContent = '❌ Please write a review.'; statusEl.style.color='red'; return; }
+
+      statusEl.textContent = 'Saving…';
+      statusEl.style.color = '#888';
+
+      try {
+        await addDoc(collection(db, 'reviews'), {
+          restaurantId,
+          username,
+          uid: currentUser.uid,
+          rating,
+          text,
+          createdAt: serverTimestamp()
+        });
+
+        // Recalculate and store avgRating + reviewCount on the restaurant doc
+        try {
+          const allReviewsSnap = await getDocs(
+            query(collection(db, 'reviews'), where('restaurantId', '==', restaurantId))
+          );
+          let total = 0, count = 0;
+          allReviewsSnap.forEach(d => {
+            if (d.data().rating) { total += d.data().rating; count++; }
+          });
+          if (count > 0) {
+            await updateDoc(doc(db, 'restaurants', restaurantId), {
+              avgRating:   Math.round((total / count) * 10) / 10,
+              reviewCount: count,
+            });
+          }
+        } catch(e) { console.warn('Could not update avgRating:', e); }
+
+        statusEl.textContent = '✅ Review submitted!';
+        statusEl.style.color = 'green';
+        document.getElementById('rv-text').value = '';
+        selectedRating = 0;
+        document.getElementById('rv-rating').value = 0;
+        highlightStars(0);
+        await loadReviews();
+      } catch(e) {
+        console.error('Review submit error:', e);
+        statusEl.textContent = '❌ ' + e.message;
+        statusEl.style.color = 'red';
+      }
+    };
+
+
+    // ── Admin: check isAdmin and wire up edit/delete ──────────────────
+    let restaurantData = {};
+
+    async function checkAdmin(user) {
+      if (!user) return;
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid));
+        if (userSnap.exists() && userSnap.data().isAdmin === true) {
+          const bar = document.getElementById('admin-bar');
+          if (bar) { bar.style.display = 'flex'; }
+        }
+      } catch(e) { console.warn('Admin check failed:', e); }
+    }
+
+    window.openEditModal = function() {
+      // Pre-fill form with current restaurant data
+      const r = restaurantData;
+      document.getElementById('edit-name').value    = r.name    || '';
+      document.getElementById('edit-phone').value   = r.phone   || '';
+      document.getElementById('edit-hours').value   = r.hours   || '';
+      document.getElementById('edit-url').value     = r.url     || '';
+      document.getElementById('edit-address').value = r.address || '';
+      document.getElementById('edit-city').value    = r.city    || '';
+      document.getElementById('edit-state').value   = r.state   || '';
+      document.getElementById('edit-zip').value     = r.zip     || '';
+      document.getElementById('edit-status').textContent = '';
+      document.getElementById('edit-modal').style.display = 'block';
+    };
+
+    window.closeEditModal = function() {
+      document.getElementById('edit-modal').style.display = 'none';
+    };
+
+    // Close modal on backdrop click
+    document.getElementById('edit-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+
+    window.saveEdit = async function() {
+      const statusEl = document.getElementById('edit-status');
+      const name = document.getElementById('edit-name').value.trim();
+      if (!name) { statusEl.textContent = '❌ Name is required.'; statusEl.style.color='red'; return; }
+
+      statusEl.textContent = 'Saving…';
+      statusEl.style.color = '#888';
+
+      const updates = {
+        name,
+        phone:   document.getElementById('edit-phone').value.trim()   || null,
+        hours:   document.getElementById('edit-hours').value.trim()   || null,
+        url:     document.getElementById('edit-url').value.trim()     || null,
+        address: document.getElementById('edit-address').value.trim() || null,
+        city:    document.getElementById('edit-city').value.trim()    || null,
+        state:   document.getElementById('edit-state').value.trim().toUpperCase() || null,
+        zip:     document.getElementById('edit-zip').value.trim()     || null,
+      };
+
+      // If address changed, re-geocode
+      const addrChanged = updates.address !== (restaurantData.address || '') ||
+                          updates.city    !== (restaurantData.city    || '') ||
+                          updates.state   !== (restaurantData.state   || '');
+      if (addrChanged && updates.address) {
+        try {
+          const q = [updates.address, updates.city, updates.state, updates.zip].filter(Boolean).join(', ') + ', USA';
+          const res  = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
+          const data = await res.json();
+          if (data && data.length > 0) {
+            updates.lat = parseFloat(data[0].lat);
+            updates.lng = parseFloat(data[0].lon);
+          }
+        } catch(e) { console.warn('Re-geocode failed:', e); }
+      }
+
+      try {
+        await updateDoc(doc(db, 'restaurants', restaurantId), updates);
+        Object.assign(restaurantData, updates);
+        // Update displayed fields
+        document.getElementById('r-name').textContent    = updates.name;
+        document.getElementById('r-address').textContent = [updates.address, updates.city, updates.state, updates.zip].filter(Boolean).join(', ');
+        document.getElementById('r-phone').textContent   = updates.phone || '—';
+        document.getElementById('r-hours').textContent   = updates.hours || '—';
+        const urlEl = document.getElementById('r-url');
+        if (urlEl) { urlEl.href = updates.url || '#'; urlEl.textContent = updates.url || ''; }
+        statusEl.textContent = '✅ Saved!';
+        statusEl.style.color = 'green';
+        setTimeout(closeEditModal, 1000);
+      } catch(e) {
+        statusEl.textContent = '❌ ' + e.message;
+        statusEl.style.color = 'red';
+      }
+    };
+
+    window.confirmDelete = function() {
+      const name = restaurantData.name || 'this restaurant';
+      if (confirm('Delete "' + name + '"? This cannot be undone.')) {
+        deleteRestaurant();
+      }
+    };
+
+    async function deleteRestaurant() {
+      try {
+        await deleteDoc(doc(db, 'restaurants', restaurantId));
+        alert('Restaurant deleted.');
+        window.location.href = 'sf-staging.html';
+      } catch(e) {
+        alert('Delete failed: ' + e.message);
+      }
+    }
+
+  </script>
+
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click', function() {
+      var nav = document.getElementById('bs-navbar');
+      nav.classList.toggle('open');
+      this.setAttribute('aria-expanded', nav.classList.contains('open'));
+    });
+  </script>
+
+</body>
+</html>
