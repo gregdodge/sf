@@ -261,11 +261,11 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="sf-staging.html">SliceFinder</a>
+        <a class="navbar-brand" href="index.html">SliceFinder</a>
       </div>
       <div id="bs-navbar">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="sf-staging.html">Restaurants</a></li>
+          <li class="active"><a href="index.html">Restaurants</a></li>
           <li><a href="#">Frozen Pizza</a></li>
           <li><a href="#">Pizza News</a></li>
           <li><a href="#">My Profile</a></li>
@@ -278,14 +278,14 @@
   </nav>
 
   <div id="loading">🍕 Loading restaurant…</div>
-  <div id="error-msg"><h3>Restaurant not found.</h3><a href="sf-staging.html">← Back to map</a></div>
+  <div id="error-msg"><h3>Restaurant not found.</h3><a href="index.html">← Back to map</a></div>
 
   <div id="page-content" style="display:none;">
     <div class="page-container">
 
       <!-- Hero + Detail Card -->
       <div class="restaurant-hero">
-        <a href="sf-staging.html" class="back-link">← Back to map</a>
+        <a href="index.html" class="back-link">← Back to map</a>
         <!-- Admin bar — only shown to admins -->
         <div id="admin-bar">
           <span>⚙️ Admin</span>
@@ -866,7 +866,7 @@
       try {
         await deleteDoc(doc(db, 'restaurants', restaurantId));
         alert('Restaurant deleted.');
-        window.location.href = 'sf-staging.html';
+        window.location.href = 'index.html';
       } catch(e) {
         alert('Delete failed: ' + e.message);
       }
