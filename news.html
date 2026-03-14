@@ -200,7 +200,7 @@
       }
       list.innerHTML = posts.map(p => `
         <div class="post-card" id="post-${p.id}">
-          <div class="post-title">${p.title || 'Untitled'}</div>
+          <a href="news-post.html?id=${p.id}" class="post-title" style="display:block; text-decoration:none;">${p.title || 'Untitled'}</a>
           <div class="post-meta">${formatDate(p.createdAt)}</div>
           <div class="post-body">${p.body || ''}</div>
           ${p.linkUrl ? `<div class="post-link"><a href="${p.linkUrl}" target="_blank" rel="noopener">${p.linkText || 'Read more'}</a></div>` : ''}
