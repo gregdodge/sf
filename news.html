@@ -1,1 +1,232 @@
-asdf
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>'>
+  <title>SliceFinder – Pizza News</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alfa%20Slab%20One">
+  <style>
+    html, body { margin:0; padding:0; font-family:Tahoma,sans-serif; background:#f5f5f5; overflow-x:hidden; }
+
+    .navbar { margin-bottom:0; border-radius:0; width:100%; }
+    .navbar-brand { font-family:'Alfa Slab One',serif; color:#c0392b !important; font-size:24px; letter-spacing:1px; }
+    @media (max-width:767px) {
+      #bs-navbar { display:none; width:100%; }
+      #bs-navbar.open { display:block; }
+      #bs-navbar .nav > li > a { color:#fff !important; padding:10px 16px; }
+      #bs-navbar .nav > li > a:hover { background:#333 !important; }
+      #nav-toggle { display:block !important; }
+    }
+    @media (min-width:768px) {
+      #bs-navbar { display:block !important; }
+      #nav-toggle { display:none !important; }
+    }
+
+    /* Red header bar */
+    #news-header {
+      background-color:#c0392b; color:#fff;
+      font-family:'Alfa Slab One',serif; font-size:18px;
+      padding:8px 20px; letter-spacing:0.5px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+
+    .page-container { max-width:740px; margin:30px auto; padding:0 16px 60px; }
+
+    /* Post card */
+    .post-card {
+      background:#fff; border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.07);
+      padding:24px 28px; margin-bottom:20px;
+      border-left:4px solid #c0392b;
+    }
+    .post-card:hover { box-shadow:0 4px 14px rgba(0,0,0,0.1); }
+
+    .post-title {
+      font-family:'Alfa Slab One',serif;
+      color:#222; font-size:20px; margin:0 0 6px;
+      line-height:1.3;
+    }
+    .post-meta {
+      font-size:11px; color:#aaa; margin-bottom:12px;
+      text-transform:uppercase; letter-spacing:1px;
+    }
+    .post-body {
+      font-size:14px; color:#444; line-height:1.7;
+      margin-bottom:14px; white-space:pre-wrap;
+    }
+    .post-link a {
+      color:#c0392b; font-size:13px; font-weight:bold;
+      text-decoration:none;
+    }
+    .post-link a:hover { text-decoration:underline; }
+    .post-link a::after { content:' →'; }
+
+    /* Admin delete button */
+    .post-admin {
+      margin-top:12px; padding-top:10px;
+      border-top:1px solid #f0f0f0;
+      display:flex; gap:8px;
+    }
+
+    #loading-msg { text-align:center; padding:40px; color:#aaa; font-style:italic; }
+    #empty-msg   { text-align:center; padding:40px; color:#aaa; }
+
+    /* Add button in header */
+    #add-news-btn {
+      display:none; background:#fff; color:#c0392b;
+      font-size:12px; font-weight:bold; padding:3px 10px;
+      border-radius:4px; text-decoration:none;
+      font-family:Tahoma,sans-serif;
+    }
+
+    footer { background:#555; color:#fff; padding:15px; text-align:center; margin-top:20px; }
+    footer p { margin:0; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid" style="padding:0 10px;">
+      <div class="navbar-header">
+        <button id="nav-toggle" type="button" class="navbar-toggle" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">SliceFinder</a>
+      </div>
+      <div id="bs-navbar">
+        <ul class="nav navbar-nav">
+          <li><a href="index.html">Restaurants</a></li>
+          <li><a href="frozen.html">Frozen Pizza</a></li>
+          <li class="active"><a href="news.html">Pizza News</a></li>
+          <li><a href="profile.html">My Profile</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="profile.html" id="nav-auth-btn" style="color:#c0392b !important;font-weight:bold;">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="news-header">
+    <span>🗞️ Pizza in the News</span>
+    <a id="add-news-btn" href="add-news.html">+ Add Post</a>
+  </div>
+
+  <div class="page-container">
+    <div id="posts-list">
+      <div id="loading-msg">Loading pizza news…</div>
+    </div>
+  </div>
+
+  <footer><p>SliceFinder &copy;2026</p></footer>
+
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click', function() {
+      var nav = document.getElementById('bs-navbar');
+      nav.classList.toggle('open');
+      this.setAttribute('aria-expanded', nav.classList.contains('open'));
+    });
+  </script>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+    import { getFirestore, collection, getDocs, doc, getDoc, deleteDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-5Bz4rpHehUbxX7kP__-ap0xSuSdwZ0E",
+      authDomain: "slicefinder-afd7f.firebaseapp.com",
+      projectId: "slicefinder-afd7f",
+      storageBucket: "slicefinder-afd7f.firebasestorage.app",
+      messagingSenderId: "103165329059",
+      appId: "1:103165329059:web:721f516c20d701ebe98916"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
+
+    let isAdmin = false;
+
+    // ── Auth ──────────────────────────────────────────────────────────
+    onAuthStateChanged(auth, async (user) => {
+      const btn = document.getElementById('nav-auth-btn');
+      if (btn) btn.textContent = user ? (user.displayName || 'My Profile') : 'Login';
+
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists() && userDoc.data().isAdmin === true) {
+            isAdmin = true;
+            document.getElementById('add-news-btn').style.display = 'inline-block';
+            // Re-render to show admin controls if posts already loaded
+            renderPosts(window._loadedPosts || []);
+          }
+        } catch(e) {}
+      }
+    });
+
+    // ── Load posts ────────────────────────────────────────────────────
+    async function loadPosts() {
+      try {
+        const q = query(collection(db, 'news'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        const posts = [];
+        snap.forEach(d => posts.push({ id: d.id, ...d.data() }));
+        window._loadedPosts = posts;
+        renderPosts(posts);
+      } catch(e) {
+        document.getElementById('posts-list').innerHTML =
+          '<div id="loading-msg">Could not load posts.</div>';
+        console.error(e);
+      }
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '';
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    }
+
+    function renderPosts(posts) {
+      const list = document.getElementById('posts-list');
+      if (posts.length === 0) {
+        list.innerHTML = '<div id="empty-msg">No posts yet — check back soon! 🍕</div>';
+        return;
+      }
+      list.innerHTML = posts.map(p => `
+        <div class="post-card" id="post-${p.id}">
+          <div class="post-title">${p.title || 'Untitled'}</div>
+          <div class="post-meta">${formatDate(p.createdAt)}</div>
+          <div class="post-body">${p.body || ''}</div>
+          ${p.linkUrl ? `<div class="post-link"><a href="${p.linkUrl}" target="_blank" rel="noopener">${p.linkText || 'Read more'}</a></div>` : ''}
+          ${isAdmin ? `
+            <div class="post-admin">
+              <a href="add-news.html?edit=${p.id}" class="btn btn-default btn-xs">✏️ Edit</a>
+              <button class="btn btn-danger btn-xs" onclick="deletePost('${p.id}', '${(p.title||'').replace(/'/g,"\\'")}')">🗑 Delete</button>
+            </div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    window.deletePost = async function(id, title) {
+      if (!confirm(`Delete "${title}"?`)) return;
+      try {
+        await deleteDoc(doc(db, 'news', id));
+        document.getElementById('post-' + id)?.remove();
+        window._loadedPosts = (window._loadedPosts || []).filter(p => p.id !== id);
+        if (document.querySelectorAll('.post-card').length === 0) {
+          document.getElementById('posts-list').innerHTML = '<div id="empty-msg">No posts yet — check back soon! 🍕</div>';
+        }
+      } catch(e) { alert('Delete failed: ' + e.message); }
+    };
+
+    loadPosts();
+  </script>
+
+</body>
+</html>
