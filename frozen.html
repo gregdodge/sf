@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,19 +63,21 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 14px;
-      border-bottom: 1px solid #eee;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e8e8e8;
       cursor: pointer;
       transition: background 0.1s;
       text-decoration: none;
       color: inherit;
     }
-    .pizza-row:hover { background: #fdf5f5; text-decoration: none; color: inherit; }
+    .pizza-row:nth-child(even) { background: #f7f7f7; }
+    .pizza-row:nth-child(odd)  { background: #fff; }
+    .pizza-row:hover { background: #fdf0f0 !important; text-decoration: none; color: inherit; }
     .pizza-row:last-child { border-bottom: none; }
 
     .pizza-name {
-      font-size: 18px;
-      font-weight: bold;
+      font-size: 15px;
+      font-weight: 600;
       color: #222;
       flex: 1;
     }
@@ -174,7 +175,7 @@
         <ul class="nav navbar-nav">
           <li><a href="index.html">Restaurants</a></li>
           <li class="active"><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">Pizza News</a></li>
+          <li><a href="#">Pizza News</a></li>
           <li><a href="profile.html">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
