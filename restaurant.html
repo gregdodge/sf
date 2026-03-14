@@ -272,10 +272,10 @@
       </div>
       <div id="bs-navbar">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="index.html">Restaurants</a></li>
-          <li><a href="#">Frozen Pizza</a></li>
-          <li><a href="#">Pizza News</a></li>
-          <li><a href="#">My Profile</a></li>
+          <li class="active"><a href="index">Restaurants</a></li>
+          <li><a href="frozen">Frozen Pizza</a></li>
+          <li><a href="news">Pizza News</a></li>
+          <li><a href="profile">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li><a href="profile.html" id="nav-auth-btn">Login</a></li>
@@ -488,6 +488,8 @@
     const params = new URLSearchParams(window.location.search);
     let restaurantData = {};
     const restaurantId = params.get('id');
+    let currentUser = null;
+    let isAdmin = false;
     if (!restaurantId) {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('error-msg').style.display = 'block';
@@ -649,8 +651,6 @@
     await loadReviews();
 
     // ── Auth state: show/hide review form ────────────────────────────
-    let currentUser = null;
-    let isAdmin = false;
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       const loginPrompt = document.getElementById('review-login-prompt');
