@@ -266,9 +266,9 @@
       <div id="bs-navbar">
         <ul class="nav navbar-nav">
           <li class="active"><a href="index.html">Restaurants</a></li>
-          <li><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">Pizza News</a></li>
-          <li><a href="profile.html">My Profile</a></li>
+          <li><a href="#">Frozen Pizza</a></li>
+          <li><a href="#">Pizza News</a></li>
+          <li><a href="#">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li><a href="profile.html" id="nav-auth-btn">Login</a></li>
@@ -479,6 +479,7 @@
 
     // ── Get restaurant ID from URL ────────────────────────────────────
     const params = new URLSearchParams(window.location.search);
+    let restaurantData = {};
     const restaurantId = params.get('id');
     if (!restaurantId) {
       document.getElementById('loading').style.display = 'none';
@@ -764,7 +765,6 @@
 
 
     // ── Admin: check isAdmin and wire up edit/delete ──────────────────
-    let restaurantData = {};
 
     async function checkAdmin(user) {
       if (!user) return;
