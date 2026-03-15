@@ -193,7 +193,7 @@
         <ul class="nav navbar-nav">
           <li><a href="index.html">Restaurants</a></li>
           <li class="active"><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">Pizza News</a></li>
+          <li><a href="#">Pizza News</a></li>
           <li><a href="profile.html">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -504,23 +504,43 @@
       document.getElementById('review-status').textContent = '';
 
       // Load reviews
+      let frozenReviewSnaps;
       try {
         const q = query(collection(db, 'frozen_reviews'), where('pizzaId', '==', id), orderBy('createdAt', 'desc'));
-        const snap = await getDocs(q);
-        if (snap.empty) {
+        frozenReviewSnaps = await getDocs(q);
+      } catch(e) {
+        // Log so the index creation link appears in the console
+        console.warn('Falling back to unordered query (create index for better perf):', e.message);
+        try {
+          frozenReviewSnaps = await getDocs(query(collection(db, 'frozen_reviews'), where('pizzaId', '==', id)));
+        } catch(e2) {
+          document.getElementById('detail-reviews').innerHTML = '<p style="color:#aaa;">Could not load reviews.</p>';
+          frozenReviewSnaps = null;
+        }
+      }
+
+      if (frozenReviewSnaps) {
+        if (frozenReviewSnaps.empty) {
           document.getElementById('detail-reviews').innerHTML = '<p style="color:#aaa; font-style:italic;">No reviews yet — be the first!</p>';
         } else {
-          document.getElementById('detail-reviews').innerHTML = snap.docs.map(d => {
-            const rv = d.data();
+          // Sort client-side by createdAt desc
+          const rvDocs = [];
+          frozenReviewSnaps.forEach(d => rvDocs.push({ id: d.id, ...d.data() }));
+          rvDocs.sort((a, b) => {
+            const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+            const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+            return tb - ta;
+          });
+          document.getElementById('detail-reviews').innerHTML = rvDocs.map(rv => {
             const full = rv.rating ? Math.round(rv.rating) : 0;
             const stars = full ? '★'.repeat(full) + '☆'.repeat(5 - full) : '';
             const canEdit = currentUser && (isAdmin || currentUser.uid === rv.uid);
             const editBtns = canEdit ? `
               <div style="margin-top:6px; display:flex; gap:6px;">
-                <button class="btn btn-default btn-xs" onclick="editFrozenReview('${d.id}', ${rv.rating||0}, ${JSON.stringify(rv.text||'')})">✏️ Edit</button>
-                <button class="btn btn-danger btn-xs" onclick="deleteFrozenReview('${d.id}')">🗑</button>
+                <button class="btn btn-default btn-xs" onclick="editFrozenReview('${rv.id}', ${rv.rating||0}, ${JSON.stringify(rv.text||'')})">✏️ Edit</button>
+                <button class="btn btn-danger btn-xs" onclick="deleteFrozenReview('${rv.id}')">🗑</button>
               </div>` : '';
-            return `<div class="review-block" id="frv-${d.id}">
+            return `<div class="review-block" id="frv-${rv.id}">
               <div class="review-user">${rv.username || 'Anonymous'}</div>
               ${stars ? `<div class="review-stars">${stars}</div>` : ''}
               <div class="review-text">${rv.text || ''}</div>
@@ -528,8 +548,6 @@
             </div>`;
           }).join('');
         }
-      } catch(e) {
-        document.getElementById('detail-reviews').innerHTML = '<p style="color:#aaa;">Could not load reviews.</p>';
       }
     };
 
