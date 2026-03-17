@@ -193,7 +193,7 @@
         <ul class="nav navbar-nav">
           <li><a href="index.html">Restaurants</a></li>
           <li class="active"><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">Pizza News</a></li>
+          <li><a href="#">Pizza News</a></li>
           <li><a href="profile.html">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -214,11 +214,9 @@
           <ul class="list-unstyled" id="top-rated-list" style="font-size:13px;">
             <li style="color:#aaa; font-style:italic;">Loading…</li>
           </ul>
-          <!--
           <hr>
           <h5><strong>Which suck the least?</strong></h5>
           <p style="font-size:12px; color:#666;">Rate and review your frozen pizza picks!</p>
-          -->
         </div>
 
         <!-- Main Content -->
@@ -231,11 +229,6 @@
             </span>
           </div>
 
-          <div style="padding:20px 20px 0px 20px;">
-          <div style="font-family: 'Alfa Slab One',serif;font-size: 18px;letter-spacing: 0.5px;color:#c0392b;font-weight:bold;">Which suck the least?</div>
-          <p style="font-size:14px; color:#666;font-family: Tahoma, sans-serif;padding-top:10px;font-weight:bold;">Rate and review your frozen pizza picks!</p>
-          </div>
-          
           <!-- List view -->
           <div id="list-view">
             <div id="pizza-list">
@@ -544,7 +537,7 @@
             const canEdit = currentUser && (isAdmin || currentUser.uid === rv.uid);
             const editBtns = canEdit ? `
               <div style="margin-top:6px; display:flex; gap:6px;">
-                <button class="btn btn-default btn-xs" onclick="editFrozenReview('${rv.id}', ${rv.rating||0}, ${JSON.stringify(rv.text||'')})">✏️ Edit</button>
+                <button class="btn btn-default btn-xs" data-id="${rv.id}" data-rating="${rv.rating||0}" onclick="editFrozenReview(this)">✏️ Edit</button>
                 <button class="btn btn-danger btn-xs" onclick="deleteFrozenReview('${rv.id}')">🗑</button>
               </div>` : '';
             return `<div class="review-block" id="frv-${rv.id}">
@@ -685,18 +678,22 @@
     };
 
     // ── Edit / delete review (frozen_reviews) ─────────────────────────
-    window.editFrozenReview = function(reviewId, currentRating, currentText) {
+    window.editFrozenReview = function(btn) {
+      const reviewId = btn.dataset.id;
+      const currentRating = +btn.dataset.rating;
       const block = document.getElementById('frv-' + reviewId);
       if (!block) return;
+      const currentText = block.querySelector('.review-text')?.textContent || '';
       // Replace content with inline edit form
       const stars = [1,2,3,4,5].map(v =>
         `<span data-val="${v}" class="${v <= currentRating ? 'active' : ''}" onclick="setEditStar(this,'frv-edit-${reviewId}')">${'★'}</span>`
       ).join('');
+      const safeText = currentText.replace(/`/g, '\`');
       block.innerHTML = `
         <div class="review-edit-form" id="frv-edit-${reviewId}">
           <div class="review-edit-stars">${stars}</div>
           <input type="hidden" id="frv-rating-${reviewId}" value="${currentRating}">
-          <textarea id="frv-text-${reviewId}" class="form-control input-sm" rows="2" style="margin-bottom:8px;">${currentText}</textarea>
+          <textarea id="frv-text-${reviewId}" class="form-control input-sm" rows="2" style="margin-bottom:8px;">${safeText}</textarea>
           <button class="btn btn-danger btn-xs" onclick="saveFrozenReview('${reviewId}')">Save</button>
           <button class="btn btn-default btn-xs" onclick="showDetail(currentPizza.id)" style="margin-left:4px;">Cancel</button>
           <span id="frv-status-${reviewId}" style="font-size:12px; margin-left:8px;"></span>
