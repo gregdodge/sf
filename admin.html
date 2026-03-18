@@ -121,7 +121,7 @@
         <ul class="nav navbar-nav">
           <li><a href="index.html">Restaurants</a></li>
           <li><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">Pizza News</a></li>
+          <li><a href="#">Pizza News</a></li>
           <li><a href="profile.html">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -169,7 +169,6 @@
         <div class="search-row">
           <input type="text" id="search-input" class="form-control input-sm"
             placeholder="Search by name…" autocomplete="off"
-            oninput="onSearchInput(this.value)"
             onkeydown="if(event.key==='Enter') doSearch()">
           <button class="btn btn-danger btn-sm" onclick="doSearch()">Search</button>
           <button class="btn btn-default btn-sm" onclick="clearSearch()">Clear</button>
@@ -223,7 +222,6 @@
     const auth = getAuth(app);
 
     let currentCollection = 'restaurants';
-    let searchTimeout = null;
 
     // ── Auth & admin check ──────────────────────────────────────────────
     onAuthStateChanged(auth, async (user) => {
@@ -287,12 +285,7 @@
     };
 
     // ── Search ──────────────────────────────────────────────────────────
-    window.onSearchInput = function(val) {
-      clearTimeout(searchTimeout);
-      if (val.length >= 2) {
-        searchTimeout = setTimeout(doSearch, 400);
-      }
-    };
+
 
     window.clearSearch = function() {
       document.getElementById('search-input').value = '';
