@@ -193,7 +193,7 @@
         <ul class="nav navbar-nav">
           <li><a href="index.html">Restaurants</a></li>
           <li class="active"><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">Pizza News</a></li>
+          <li><a href="#">Pizza News</a></li>
           <li><a href="profile.html">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -214,6 +214,9 @@
           <ul class="list-unstyled" id="top-rated-list" style="font-size:13px;">
             <li style="color:#aaa; font-style:italic;">Loading…</li>
           </ul>
+          <hr>
+          <h5><strong>Which suck the least?</strong></h5>
+          <p style="font-size:12px; color:#666;">Rate and review your frozen pizza picks!</p>
         </div>
 
         <!-- Main Content -->
@@ -225,13 +228,12 @@
               <a id="add-frozen-btn" href="add-frozen.html" style="display:none; background:#fff; color:#c0392b; font-size:12px; font-weight:bold; padding:3px 10px; border-radius:4px; text-decoration:none; font-family:Tahoma,sans-serif;">+ Add</a>
             </span>
           </div>
-          
-         <div style="padding:20px 20px 0px 20px;color: #c0392b;font-family: 'Alfa Slab One', serif;font-size: 18px;letter-spacing: 0.5px;">Which suck the least?
-           <!--<p style="font-size:16px; color:#666;ffont-family: 'Alfa Slab One', serif;">Rate and review your frozen pizza picks!</p>-->
-         </div>
-         
-           <!-- List view -->
+
+          <!-- List view -->
           <div id="list-view">
+            <div style="background-color:#c0392b; color:#fff; font-family:'Alfa Slab One',serif; font-size:14px; padding:6px 14px; letter-spacing:0.5px;">
+              Which suck the least? Rate and review here!
+            </div>
             <div id="pizza-list">
               <div id="loading-msg">Loading frozen pizzas…</div>
             </div>
@@ -239,7 +241,7 @@
 
           <!-- Detail view -->
           <div id="detail-panel">
-            <span class="back-btn" style="color:black;font-weight:bold;" onclick="showList()">← Back to all frozen pizzas</span>
+            <span class="back-btn" onclick="showList()">← Back to all frozen pizzas</span>
             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
               <h3 id="detail-name" style="margin:0;"></h3>
               <div id="admin-pizza-btns" style="display:none; gap:8px; display:none;">
@@ -406,7 +408,7 @@
         sortList('rating');
         renderTopRated();
         document.getElementById('frozen-count').textContent =
-          allPizzas.length + ' frozen pizza' + (allPizzas.length !== 1 ? 's' : '') + '';
+          allPizzas.length + ' frozen pizza' + (allPizzas.length !== 1 ? 's' : '') + ' ranked';
       } catch(e) {
         document.getElementById('loading-msg').textContent = 'Could not load frozen pizzas.';
         console.error(e);
