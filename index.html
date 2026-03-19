@@ -543,7 +543,12 @@
       const cached = getCachedRestaurants(lat, lng);
       if (cached) { renderRestaurants(cached); return; }
       try {
-        const q = query(collection(db, 'restaurants'), where('lat', '>=', lat - RADIUS), where('lat', '<=', lat + RADIUS));
+        const q = query(
+          collection(db, 'restaurants'),
+          where('lat', '>=', lat - RADIUS),
+          where('lat', '<=', lat + RADIUS),
+          limit(300)  // cap raw Firestore reads; we filter by lng and sort client-side
+        );
         const snapshot = await getDocs(q);
         const restaurants = [];
         snapshot.forEach(function(docSnap) {
@@ -552,8 +557,11 @@
             restaurants.push({ id: docSnap.id, data: r });
           }
         });
-        setCachedRestaurants(lat, lng, restaurants);
-        renderRestaurants(restaurants);
+        // Sort by avgRating desc so best restaurants show first, cap at 100 pins
+        restaurants.sort((a, b) => (b.data.avgRating || 0) - (a.data.avgRating || 0));
+        const capped = restaurants.slice(0, 100);
+        setCachedRestaurants(lat, lng, capped);
+        renderRestaurants(capped);
       } catch(e) {
         setSlicesCount('Could not load restaurants');
         console.error('Firestore error:', e);
