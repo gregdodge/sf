@@ -504,7 +504,28 @@
                 const rv = d.data();
                 return buildReviewCard(rv, areaMap[rv.restaurantId] || '', rv.restaurantId);
               });
-              container.innerHTML = cards.join('');
+
+              // If fewer than 3 reviews, top up with recently added listings
+              if (cards.length < 3) {
+                const reviewedIds = new Set(snap.docs.map(d => d.data().restaurantId));
+                const topUp = (areaRestaurants || [])
+                  .filter(r => !reviewedIds.has(r.id) && r.data.createdAt)
+                  .sort((a, b) => {
+                    const ta = a.data.createdAt?.toMillis ? a.data.createdAt.toMillis() : 0;
+                    const tb = b.data.createdAt?.toMillis ? b.data.createdAt.toMillis() : 0;
+                    return tb - ta;
+                  })
+                  .slice(0, 3 - cards.length)
+                  .map(r =>
+                    `<div class="recent-review-card">` +
+                    `<div class="rr-name"><a href="restaurant.html?id=${r.id}">${r.data.name || ''}</a></div>` +
+                    `<div class="rr-text" style="color:#aaa; font-style:italic;">Recently added — be the first to review!</div>` +
+                    `</div>`
+                  );
+                container.innerHTML = [...cards, ...topUp].join('');
+              } else {
+                container.innerHTML = cards.join('');
+              }
               return;
             }
           }
