@@ -106,7 +106,6 @@
       font-style: italic;
     }
 
-    /* Frozen pizza detail panel */
     /* Edit pizza modal */
     #edit-pizza-modal {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -214,11 +213,6 @@
           <ul class="list-unstyled" id="top-rated-list" style="font-size:13px;">
             <li style="color:#aaa; font-style:italic;">Loading…</li>
           </ul>
-          <!--
-          <hr>
-          <h5><strong>Which suck the least?</strong></h5>
-          <p style="font-size:12px; color:#666;">Rate and review your frozen pizza picks!</p>
-          -->
         </div>
 
         <!-- Main Content -->
@@ -295,6 +289,15 @@
               <input type="radio" name="sort" value="name" onchange="sortList('name')"> A–Z
             </label>
           </div>
+          <hr>
+          <h5><strong>Don't see your pizza?</strong></h5>
+          <p style="font-size:12px; color:#666;">Suggest a frozen pizza to add to the rankings!</p>
+          <div id="suggest-form">
+            <input type="text" id="suggest-name" class="form-control input-sm" placeholder="Pizza name…" style="margin-bottom:6px;">
+            <input type="text" id="suggest-brand" class="form-control input-sm" placeholder="Brand (optional)" style="margin-bottom:6px;">
+            <button class="btn btn-danger btn-sm btn-block" onclick="submitSuggestion()">Suggest it!</button>
+            <div id="suggest-status" style="font-size:12px; margin-top:6px; min-height:16px;"></div>
+          </div>
         </div>
 
       </div>
@@ -358,6 +361,7 @@
     const auth = getAuth(app);
 
     let currentUser  = null;
+    let isAdmin      = false;
     let allPizzas    = [];
     let currentPizza = null;
     let selectedRating = 0;
@@ -368,12 +372,11 @@
       const btn = document.getElementById('nav-auth-btn');
       if (btn) btn.textContent = user ? (user.displayName || 'My Profile') : 'Login';
 
-      // Show "+ Add" button for admins only
       if (user) {
         try {
-          const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js');
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists() && userDoc.data().isAdmin === true) {
+            isAdmin = true;
             const addBtn = document.getElementById('add-frozen-btn');
             if (addBtn) addBtn.style.display = 'inline-block';
           }
@@ -395,7 +398,7 @@
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────
-    function starsHtml(rating, size) {
+    function starsHtml(rating) {
       if (!rating) return '<span style="color:#ccc;">Not yet rated</span>';
       const full = Math.round(rating);
       return '★'.repeat(full) + '☆'.repeat(5 - full);
@@ -423,7 +426,7 @@
         list.innerHTML = '<div id="loading-msg">No results.</div>';
         return;
       }
-      list.innerHTML = pizzas.map((p, i) => {
+      list.innerHTML = pizzas.map((p) => {
         const stars = p.avgRating ? starsHtml(p.avgRating) : '';
         const ratingNum = p.avgRating ? `<span class="pizza-rating-num">(${p.avgRating.toFixed(1)})</span>` : '';
         const reviewCount = p.reviewCount ? `<span class="pizza-reviews">${p.reviewCount} review${p.reviewCount !== 1 ? 's' : ''}</span>` : '';
@@ -491,14 +494,18 @@
       document.getElementById('list-view').style.display  = 'none';
       document.getElementById('detail-panel').style.display = 'block';
 
+      // Show admin buttons if admin
+      const adminBtns = document.getElementById('admin-pizza-btns');
+      if (adminBtns) adminBtns.style.display = isAdmin ? 'flex' : 'none';
+
       // Show/hide review form based on auth
-      const authMsg    = document.getElementById('review-auth-msg');
+      const authMsg      = document.getElementById('review-auth-msg');
       const reviewInputs = document.getElementById('review-inputs');
       if (currentUser) {
-        authMsg.style.display = 'none';
+        authMsg.style.display    = 'none';
         reviewInputs.style.display = 'block';
       } else {
-        authMsg.style.display = 'block';
+        authMsg.style.display    = 'block';
         reviewInputs.style.display = 'none';
       }
 
@@ -514,7 +521,6 @@
         const q = query(collection(db, 'frozen_reviews'), where('pizzaId', '==', id), orderBy('createdAt', 'desc'));
         frozenReviewSnaps = await getDocs(q);
       } catch(e) {
-        // Log so the index creation link appears in the console
         console.warn('Falling back to unordered query (create index for better perf):', e.message);
         try {
           frozenReviewSnaps = await getDocs(query(collection(db, 'frozen_reviews'), where('pizzaId', '==', id)));
@@ -528,7 +534,6 @@
         if (frozenReviewSnaps.empty) {
           document.getElementById('detail-reviews').innerHTML = '<p style="color:#aaa; font-style:italic;">No reviews yet — be the first!</p>';
         } else {
-          // Sort client-side by createdAt desc
           const rvDocs = [];
           frozenReviewSnaps.forEach(d => rvDocs.push({ id: d.id, ...d.data() }));
           rvDocs.sort((a, b) => {
@@ -588,47 +593,44 @@
         const avg = Math.round((sum / count) * 10) / 10;
         await updateDoc(doc(db, 'frozen_pizzas', currentPizza.id), { avgRating: avg, reviewCount: count });
 
-        // Update local data
         const local = allPizzas.find(p => p.id === currentPizza.id);
         if (local) { local.avgRating = avg; local.reviewCount = count; }
 
         statusEl.textContent = '✅ Review submitted!';
         statusEl.style.color = 'green';
-        showDetail(currentPizza.id); // reload reviews
+        showDetail(currentPizza.id);
       } catch(e) {
         statusEl.textContent = '❌ Error: ' + e.message;
         statusEl.style.color = 'red';
       }
     };
 
-    loadPizzas();
-
-    // ── isAdmin flag ──────────────────────────────────────────────────
-    let isAdmin = false;
-
-    // Update auth state handler to also set isAdmin and show edit buttons
-    // (patch into existing onAuthStateChanged by hooking showDetail)
-    const _origShowDetail = window.showDetail;
-    window.showDetail = async function(id) {
-      await _origShowDetail(id);
-      // Show admin buttons if admin
-      const adminBtns = document.getElementById('admin-pizza-btns');
-      if (adminBtns && isAdmin) adminBtns.style.display = 'flex';
+    // ── Suggest a frozen pizza ───────────────────────────────────────────
+    window.submitSuggestion = async function() {
+      const statusEl = document.getElementById('suggest-status');
+      const name = document.getElementById('suggest-name').value.trim();
+      if (!name) { statusEl.textContent = '❌ Please enter a pizza name.'; statusEl.style.color = 'red'; return; }
+      statusEl.textContent = 'Sending…'; statusEl.style.color = '#888';
+      try {
+        await addDoc(collection(db, 'suggestions'), {
+          type:     'frozen_pizza',
+          name,
+          brand:    document.getElementById('suggest-brand').value.trim() || null,
+          uid:      currentUser ? currentUser.uid : null,
+          username: currentUser ? (currentUser.displayName || currentUser.email) : 'Anonymous',
+          createdAt: serverTimestamp(),
+        });
+        statusEl.textContent = '✅ Thanks! We\'ll look into it.';
+        statusEl.style.color = 'green';
+        document.getElementById('suggest-name').value = '';
+        document.getElementById('suggest-brand').value = '';
+      } catch(e) {
+        statusEl.textContent = '❌ Could not send. Try again.';
+        statusEl.style.color = 'red';
+      }
     };
 
-    // Check admin on auth — patch into existing handler
-    const _origAuth = auth;
-    import('https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js').then(({ onAuthStateChanged: oac }) => {
-      oac(_origAuth, async (user) => {
-        if (!user) { isAdmin = false; return; }
-        try {
-          const uSnap = await getDoc(doc(db, 'users', user.uid));
-          isAdmin = uSnap.exists() && uSnap.data().isAdmin === true;
-        } catch(e) {}
-      });
-    });
-
-    // ── Edit pizza modal ──────────────────────────────────────────────
+    // ── Edit pizza modal ──────────────────────────────────────────────────
     window.openEditPizzaModal = function() {
       const p = currentPizza;
       if (!p) return;
@@ -660,7 +662,6 @@
         };
         await updateDoc(doc(db, 'frozen_pizzas', currentPizza.id), updates);
         Object.assign(currentPizza, updates);
-        // Update local allPizzas
         const local = allPizzas.find(p => p.id === currentPizza.id);
         if (local) Object.assign(local, updates);
         document.getElementById('detail-name').textContent = name;
@@ -682,14 +683,13 @@
       } catch(e) { alert('Delete failed: ' + e.message); }
     };
 
-    // ── Edit / delete review (frozen_reviews) ─────────────────────────
+    // ── Edit / delete review ──────────────────────────────────────────────
     window.editFrozenReview = function(btn) {
       const reviewId = btn.dataset.id;
       const currentRating = +btn.dataset.rating;
       const block = document.getElementById('frv-' + reviewId);
       if (!block) return;
       const currentText = block.querySelector('.review-text')?.textContent || '';
-      // Replace content with inline edit form
       const stars = [1,2,3,4,5].map(v =>
         `<span data-val="${v}" class="${v <= currentRating ? 'active' : ''}" onclick="setEditStar(this,'frv-edit-${reviewId}')">${'★'}</span>`
       ).join('');
@@ -722,7 +722,6 @@
       statusEl.textContent = 'Saving…';
       try {
         await updateDoc(doc(db, 'frozen_reviews', reviewId), { rating, text });
-        // Recalculate avg
         const allRevSnap = await getDocs(query(collection(db, 'frozen_reviews'), where('pizzaId', '==', currentPizza.id)));
         let sum = 0, count = 0;
         allRevSnap.forEach(d => { if (d.data().rating) { sum += d.data().rating; count++; } });
@@ -749,6 +748,7 @@
       } catch(e) { alert('Delete failed: ' + e.message); }
     };
 
+    loadPizzas();
   </script>
 
 </body>
