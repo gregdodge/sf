@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>'>
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
   <title>SliceFinder – My Profile</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alfa%20Slab%20One">
@@ -21,7 +20,7 @@
       #bs-navbar .nav > li > a:hover { background:#333 !important; }
       #nav-toggle { display:block !important; }
     }
-    @media (min-width:767px) {
+    @media (min-width:768px) {
       #bs-navbar { display:block !important; }
       #nav-toggle { display:none !important; }
     }
@@ -161,7 +160,7 @@
     /* ── Empty states ── */
     .empty-state { color:#aaa; font-size:13px; padding:20px 0; text-align:center; }
 
-    footer { background:#555; color:#fff; padding:10px; text-align:center; margin-top:20px; }
+    footer { background:#555; color:#fff; padding:15px; text-align:center; margin-top:20px; }
     footer p { margin:0; }
   </style>
 </head>
@@ -180,7 +179,7 @@
         <ul class="nav navbar-nav">
           <li><a href="index.html">Restaurants</a></li>
           <li><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">Pizza News</a></li>
+          <li><a href="#">Pizza News</a></li>
           <li class="active"><a href="profile.html">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -556,7 +555,9 @@
             if (rSnap.exists()) restaurantName = rSnap.data().name;
           } catch(e) {}
           const starStr = '★'.repeat(rv.rating || 0) + '☆'.repeat(5 - (rv.rating || 0));
-          const dateStr = rv.createdAt?.toDate
+          const dateStr = rv.importedFrom
+            ? 'Over a year ago'
+            : rv.createdAt?.toDate
             ? rv.createdAt.toDate().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })
             : '';
           const div = document.createElement('div');
@@ -692,7 +693,9 @@
               if (rSnap.exists()) restaurantName = rSnap.data().name;
             } catch(e) {}
             const starStr = '★'.repeat(rv.rating || 0) + '☆'.repeat(5 - (rv.rating || 0));
-            const dateStr = rv.createdAt?.toDate
+            const dateStr = rv.importedFrom
+              ? 'Over a year ago'
+              : rv.createdAt?.toDate
               ? rv.createdAt.toDate().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })
               : '';
             const div = document.createElement('div');
