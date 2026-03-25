@@ -81,7 +81,28 @@
       -webkit-box-orient:vertical;
     }
     .recent-review-card .rr-user { color:#888; margin-top:4px; font-size:11px; }
-    @media (max-width:767px) { #recent-reviews { display:none; } .recent-reviews-label { display:none !important; } }
+    @media (max-width:767px) {
+      .recent-reviews-label { display:none !important; }
+      .mobile-reviews-label { display:block !important; }
+      #recent-reviews {
+        display:block !important;
+        flex-direction:column;
+        padding:8px 12px !important;
+        gap:0;
+      }
+      /* Show only the first card on mobile, hide the rest */
+      #recent-reviews .recent-review-card:not(:first-child) { display:none; }
+      /* Compact single-line format on mobile */
+      #recent-reviews .recent-review-card {
+        display:flex; align-items:center; gap:8px;
+        padding:6px 8px; border-radius:4px;
+        background:#fff; border:1px solid #e0e0e0;
+      }
+      #recent-reviews .recent-review-card .rr-name { margin:0; font-size:12px; flex:1; }
+      #recent-reviews .recent-review-card .rr-stars { font-size:11px; margin:0; }
+      #recent-reviews .recent-review-card .rr-text { display:none; }
+      #recent-reviews .recent-review-card .rr-user { display:none; }
+    }
 
     .pizza-marker-wrap {
       width:38px; height:38px;
@@ -175,7 +196,7 @@
         <ul class="nav navbar-nav">
           <li class="active"><a href="index.html">Restaurants</a></li>
           <li><a href="frozen.html">Frozen Pizza</a></li>
-          <li><a href="news.html">News</a></li>
+          <li><a href="news.html">Pizza News</a></li>
           <li><a href="profile.html">My Profile</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -229,14 +250,15 @@
         <!-- Main Content -->
         <div class="col-sm-8" style="display:flex;flex-direction:column;flex:1;">
           <div id="slices-header">
-            <span id="slices-headline"><a href="https://gregdodge.github.io/sf/dj-gato.gif" style="border: none;">🍕</a> Find and rate the best pizza</span>
+            <span id="slices-headline">🍕 Find and rate the best pizza</span>
             <span id="slices-count">Loading…</span>
           </div>
           <div id="geo-status">Detecting your location…</div>
           <div id="map-frame">
             <button id="search-area-btn" onclick="searchThisArea()">🔍 Search this area</button>
           </div>
-          <div id="slices-header" style="font-size:14px; display:block;" class="recent-reviews-label">Recent user reviews:</div>
+          <div id="slices-header" style="font-size:14px; display:block;" class="recent-reviews-label">Recent local user reviews:</div>
+          <div style="font-size:11px; color:#888; padding:4px 12px 0; display:none;" class="mobile-reviews-label">📍 Recent nearby review:</div>
           <div id="recent-reviews" style="padding:20px;">
             <div class="recent-review-card" style="color:#aaa;font-style:italic;">Loading recent reviews…</div>
           </div>
