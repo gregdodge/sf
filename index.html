@@ -299,7 +299,7 @@
             <input type="text" id="contact-name" class="form-control input-sm" placeholder="Your name (optional)" style="margin-bottom:6px;display:none !important;">
             <textarea id="contact-message" class="form-control input-sm" rows="1" placeholder="Message…" style="margin-bottom:6px;"></textarea>
             <input type="email" id="contact-email" class="form-control input-sm" placeholder="Email (optional)" style="margin-bottom:6px;">
-            <button class="btn btn-danger btn-sm btn-block" onclick="submitContact()">Send</button>
+            <button class="btn btn-default btn-sm btn-block" onclick="submitContact()">Send</button>
             <div id="contact-status" style="font-size:12px; margin-top:6px; min-height:16px;"></div>
           </div>
 
@@ -715,7 +715,7 @@
           message,
           createdAt: serverTimestamp(),
         });
-        statusEl.textContent = '✅ Thanks! We\'ll be in touch.';
+        statusEl.textContent = '✅ Submitted! We\'ll be right back to you.';
         statusEl.style.color = 'green';
         document.getElementById('contact-name').value    = '';
         document.getElementById('contact-email').value   = '';
