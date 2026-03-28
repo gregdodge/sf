@@ -90,9 +90,7 @@
         padding:8px 12px !important;
         gap:0;
       }
-      /* Show only the first card on mobile, hide the rest */
       #recent-reviews .recent-review-card:not(:first-child) { display:none; }
-      /* Compact single-line format on mobile */
       #recent-reviews .recent-review-card {
         display:flex; align-items:center; gap:8px;
         padding:6px 8px; border-radius:4px;
@@ -294,6 +292,16 @@
           <h5><strong>Add a Pizza Place</strong></h5>
           <p style="font-size:12px;">Know a great spot that's missing? Help the community!</p>
           <a href="add-restaurant.html" class="btn btn-default btn-sm btn-block">+ Add Restaurant</a>
+          <hr>
+          <h5><strong>Questions or Suggestions?</strong></h5>
+          <p style="font-size:12px; color:#666;">We'd love to hear from you!</p>
+          <div>
+            <input type="text" id="contact-name" class="form-control input-sm" placeholder="Your name (optional)" style="margin-bottom:6px;">
+            <input type="email" id="contact-email" class="form-control input-sm" placeholder="Email (optional)" style="margin-bottom:6px;">
+            <textarea id="contact-message" class="form-control input-sm" rows="3" placeholder="Your message…" style="margin-bottom:6px;"></textarea>
+            <button class="btn btn-danger btn-sm btn-block" onclick="submitContact()">Send</button>
+            <div id="contact-status" style="font-size:12px; margin-top:6px; min-height:16px;"></div>
+          </div>
 
           <div align="center" style="position:absolute;bottom:50px;">
             <a href="https://gregdodge.github.io/sf/images/ny-style.gif" style="border:none;"><img src="https://gregdodge.github.io/sf/images/mine.jpg" style="width:80%"/></a>
@@ -470,7 +478,7 @@
   <!-- ── Firebase: load restaurants near a location ──────────────── -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
-    import { getFirestore, collection, getDocs, getDoc, doc, query, where, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+    import { getFirestore, collection, getDocs, getDoc, doc, query, where, orderBy, limit, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyB-5Bz4rpHehUbxX7kP__-ap0xSuSdwZ0E",
@@ -489,7 +497,6 @@
     async function loadMostReviewed() {
       const el = document.getElementById('most-reviewed-list');
       if (!el) return;
-      // Read a single pre-computed summary doc — 1 read instead of scanning all restaurants
       try {
         const snap = await getDoc(doc(db, 'stats', 'most_reviewed'));
         if (!snap.exists()) { el.innerHTML = '<li style="color:#aaa;">No data yet</li>'; return; }
@@ -509,7 +516,6 @@
     async function loadTopReviewers() {
       const el = document.getElementById('top-reviewers-list');
       if (!el) return;
-      // Read a single pre-computed summary doc — 1 read instead of 400+
       try {
         const snap = await getDoc(doc(db, 'stats', 'top_reviewers'));
         if (!snap.exists()) { el.innerHTML = '<li style="color:#aaa;">No data yet</li>'; return; }
@@ -542,12 +548,10 @@
     }
 
     // ── Contextual recent reviews ─────────────────────────────────────
-    // Called after map loads with the local restaurant list
     window.loadRecentReviews = async function(areaRestaurants) {
       const container = document.getElementById('recent-reviews');
       if (!container) return;
 
-      // Build a lookup map of id -> name for area restaurants
       const areaMap = {};
       (areaRestaurants || []).forEach(r => { areaMap[r.id] = r.data.name || ''; });
       const areaIds = Object.keys(areaMap);
@@ -555,7 +559,6 @@
       // ── Scenario 1: reviews for area restaurants ──────────────────
       if (areaIds.length > 0) {
         try {
-          // Firestore 'in' supports max 30 items — pick top 15 by reviewCount
           const topIds = (areaRestaurants || [])
             .filter(r => r.data.reviewCount > 0)
             .sort((a, b) => (b.data.reviewCount || 0) - (a.data.reviewCount || 0))
@@ -575,8 +578,6 @@
                 const rv = d.data();
                 return buildReviewCard(rv, areaMap[rv.restaurantId] || '', rv.restaurantId);
               });
-
-              // If fewer than 3 reviews, top up with recently added listings
               if (cards.length < 3) {
                 const reviewedIds = new Set(snap.docs.map(d => d.data().restaurantId));
                 const topUp = (areaRestaurants || [])
@@ -627,19 +628,18 @@
         }
       }
 
-      // ── Scenario 3: no listings in area — show friendly empty state ──
+      // ── Scenario 3: no listings in area ──
       container.innerHTML =
         `<div class="recent-review-card" style="color:#aaa; font-style:italic;">
           No pizza spots here yet — <a href="add-restaurant.html" style="color:#c0392b; font-weight:bold;">add one!</a>
         </div>`;
     };
 
-    // Initial load — global fallback until map loads
     window.loadRecentReviews([]);
     loadMostReviewed();
     loadTopReviewers();
 
-    const RADIUS = 0.10; // ~7 mile radius — reduces over-fetching on lat range query
+    const RADIUS = 0.10;
     const CACHE_KEY = 'sf-restaurants-cache';
     const CACHE_TTL = 30 * 60 * 1000;
 
@@ -670,7 +670,6 @@
       setSlicesCount(countLabel);
       var nameInput = document.getElementById('name-search-input');
       if (nameInput && nameInput.value.trim()) window.filterMarkersByName(nameInput.value);
-      // Update recent reviews for this area
       if (window.loadRecentReviews) window.loadRecentReviews(restaurants);
     }
 
@@ -683,7 +682,7 @@
           collection(db, 'restaurants'),
           where('lat', '>=', lat - RADIUS),
           where('lat', '<=', lat + RADIUS),
-          limit(300)  // cap raw Firestore reads; we filter by lng and sort client-side
+          limit(300)
         );
         const snapshot = await getDocs(q);
         const restaurants = [];
@@ -693,7 +692,6 @@
             restaurants.push({ id: docSnap.id, data: r });
           }
         });
-        // Sort by avgRating desc so best restaurants show first, cap at 100 pins
         restaurants.sort((a, b) => (b.data.avgRating || 0) - (a.data.avgRating || 0));
         const capped = restaurants.slice(0, 200);
         setCachedRestaurants(lat, lng, capped);
@@ -701,6 +699,30 @@
       } catch(e) {
         setSlicesCount('Could not load restaurants');
         console.error('Firestore error:', e);
+      }
+    };
+
+    // ── Contact form ──────────────────────────────────────────────────
+    window.submitContact = async function() {
+      const statusEl = document.getElementById('contact-status');
+      const message  = document.getElementById('contact-message').value.trim();
+      if (!message) { statusEl.textContent = '❌ Please enter a message.'; statusEl.style.color = 'red'; return; }
+      statusEl.textContent = 'Sending…'; statusEl.style.color = '#888';
+      try {
+        await addDoc(collection(db, 'contact'), {
+          name:      document.getElementById('contact-name').value.trim()  || null,
+          email:     document.getElementById('contact-email').value.trim() || null,
+          message,
+          createdAt: serverTimestamp(),
+        });
+        statusEl.textContent = '✅ Thanks! We\'ll be in touch.';
+        statusEl.style.color = 'green';
+        document.getElementById('contact-name').value    = '';
+        document.getElementById('contact-email').value   = '';
+        document.getElementById('contact-message').value = '';
+      } catch(e) {
+        statusEl.textContent = '❌ Could not send. Try again.';
+        statusEl.style.color = 'red';
       }
     };
 
