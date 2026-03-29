@@ -254,7 +254,7 @@
         <div class="col-sm-8" style="display:flex;flex-direction:column;flex:1;">
           <div id="slices-header">
             <span id="slices-headline">
-              <a href="https://gregdodge.github.io/sf/images/sohungrysoscared.gif" style="text-decoration: none !important;"><span style="display: inline-block;">🍕</span></a> Find and rate the best pizza</span>
+              <a href="https://gregdodge.github.io/sf/images/sohungrysoscared.gif" style="text-decoration: none !important;" title="STRESSED"><span style="display: inline-block;">🍕</span></a> Find and rate the best pizza</span>
             <span id="slices-count">Loading…</span>
           </div>
           <div id="geo-status">Detecting your location…</div>
@@ -711,7 +711,7 @@
     window.submitContact = async function() {
       const statusEl = document.getElementById('contact-status');
       const message  = document.getElementById('contact-message').value.trim();
-      if (!message) { statusEl.textContent = '↓ El gato asks for your thoughts'; statusEl.style.color = '#d9534f'; return; }
+      if (!message) { statusEl.textContent = '↓ El gato asks for your thoughts '; statusEl.style.color = '#d9534f'; return; }
       statusEl.textContent = 'Sending…'; statusEl.style.color = '#888';
       try {
         await addDoc(collection(db, 'contact'), {
