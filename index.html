@@ -767,7 +767,7 @@
          }
        });
        restaurants.sort((a, b) => (b.data.avgRating || 0) - (a.data.avgRating || 0));
-       const capped = restaurants.slice(0, 300);
+       const capped = restaurants.slice(0, 250);
        setCachedRestaurants(lat, lng, capped);
        renderRestaurants(capped);
      } catch(e) {
