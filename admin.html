@@ -147,15 +147,15 @@
 
       <!-- Header -->
       <div class="admin-card">
-        <h3>>Firestore Data</h3>
-        <!-- <p class="subtitle"></p> -->
+        <h3>Firestore Data</h3>
+        <p class="subtitle"></p>
 
         <!-- Stats -->
         <div class="stats-row">
           <div class="stat-box"><div class="stat-num" id="stat-restaurants">—</div><div class="stat-label">Restaurants</div></div>
           <div class="stat-box"><div class="stat-num" id="stat-reviews">—</div><div class="stat-label">Reviews</div></div>
           <div class="stat-box"><div class="stat-num" id="stat-users">—</div><div class="stat-label">Users</div></div>
-          <div class="stat-box"><div class="stat-num" id="stat-frozen">—</div><div class="stat-label">Frozen Pizzas</div></div>
+          <div class="stat-box"><div class="stat-num" id="stat-frozen">—</div><div class="stat-label">Frozens</div></div>
         </div>
 
         <!-- Collection tabs -->
@@ -282,7 +282,7 @@
       };
       document.getElementById('search-hint').textContent = hints[col] || '';
       document.getElementById('search-input').value = '';
-      document.getElementById('results-wrap').innerHTML = '<div id="status-msg">Enter a search term above</div>';
+      document.getElementById('results-wrap').innerHTML = '<div id="status-msg"></div>';
     };
 
     // ── Search ──────────────────────────────────────────────────────────
@@ -290,14 +290,14 @@
 
     window.clearSearch = function() {
       document.getElementById('search-input').value = '';
-      document.getElementById('results-wrap').innerHTML = '<div id="status-msg">Enter a search term above</div>';
+      document.getElementById('results-wrap').innerHTML = '<div id="status-msg"></div>';
     };
 
     window.doSearch = async function() {
       const q = document.getElementById('search-input').value.trim();
       const wrap = document.getElementById('results-wrap');
 
-      if (!q) { wrap.innerHTML = '<div id="status-msg">Enter a search term above</div>'; return; }
+      if (!q) { wrap.innerHTML = '<div id="status-msg"></div>'; return; }
 
       wrap.innerHTML = '<div id="status-msg">Searching…</div>';
 
