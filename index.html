@@ -802,6 +802,7 @@
      } catch(e) {
        statusEl.textContent = '❌ Could not send. Try again.';
        statusEl.style.color = 'red';
+      console.error('Contact form error:', e);
      }
    };
 
