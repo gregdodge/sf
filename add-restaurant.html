@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -158,7 +157,6 @@
   <!-- Add Restaurant Form -->
   <div class="form-card container">
     <h3>Couldn't find your restaurant? Add it please!</h3>
-    <!-- <p style="font-size:13px; color:#666;">Add that missing pizza spot!</p> -->
 
     <div class="section-label">Restaurant Info</div>
 
@@ -166,8 +164,6 @@
       <label>Restaurant Name <span style="color:#c0392b">*</span></label>
       <input type="text" id="f-name" class="form-control" placeholder="e.g. Tony's Pizza Napoletana">
     </div>
-
-    <!--<div class="section-label">Location</div>-->
 
     <div class="form-group">
       <label>Street Address <span style="color:#c0392b">*</span></label>
@@ -313,7 +309,7 @@
       } catch(e) {
         console.warn('Geocoding failed:', e);
       }
-      return null; // still save the restaurant, just won't appear on map
+      return null;
     }
 
     // ── Form submit ─────────────────────────────────────────────────────
@@ -339,7 +335,6 @@
         return;
       }
 
-      // Flush any typed-but-not-entered tag
       const tagInput = document.getElementById('tag-input');
       const pending = tagInput.value.replace(/,/g, '').trim();
       if (pending && !tags.includes(pending)) { tags.push(pending); tagInput.value = ''; renderTags(); }
@@ -348,7 +343,6 @@
       btn.textContent = 'Locating…';
       statusEl.textContent = '';
 
-      // Geocode silently — restaurant won't show on map without lat/lng
       const coords = await geocodeAddress(address, city, state, zip);
       if (!coords) {
         console.warn('Could not geocode address for', name, '— saving without lat/lng');
@@ -373,7 +367,7 @@
       try {
         const { collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js');
         const ref = await addDoc(collection(db, 'restaurants'), { ...data, createdAt: serverTimestamp() });
-        statusEl.innerHTML = `✅ A squirrel or cat has added "${name}" to the database<br/><br/><a href="restaurant.html?id=${ref.id}" style="color:#c0392b;font-weight:bold;font-size:16px;text-decoration:underline;">View restaurant and rate it now!</a>`;
+        statusEl.textContent = '✅ Added! Redirecting to listing…';
         statusEl.style.color = 'green';
         if (!coords) {
           statusEl.innerHTML += '<br><span style="color:#e67e22; font-size:12px; font-weight:normal;"><br/>⚠️ Could not auto-detect location — this restaurant won\'t appear on the map yet.</span>';
@@ -384,6 +378,7 @@
         });
         tags.length = 0;
         renderTags();
+        setTimeout(() => { window.location.href = 'restaurant.html?id=' + ref.id; }, 1500);
       } catch(e) {
         statusEl.textContent = '❌ Error saving: ' + e.message;
         statusEl.style.color = 'red';
