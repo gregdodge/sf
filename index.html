@@ -237,11 +237,10 @@
          placeholder="City or ZIP" autocomplete="off"
          onkeydown="if(event.key==='Enter'){mobileSearch();event.preventDefault();}">
      </div>
-     <div style="flex:1;">
-       <input type="text" id="mobile-state-input" class="form-control input-sm"
-         placeholder="State (opt.)" autocomplete="off" maxlength="2"
+     <div style="flex:0.6;">
+      <input type="text" id="mobile-state-input" class="form-control input-sm" placeholder="ST" autocomplete="off" maxlength="2"
          onkeydown="if(event.key==='Enter'){mobileSearch();event.preventDefault();}">
-     </div>
+      </div>
      <div>
        <button class="btn btn-danger btn-sm" onclick="mobileSearch()">Search</button>
      </div>
