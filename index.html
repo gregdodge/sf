@@ -228,27 +228,6 @@
    </div>
  </nav>
 
-
- <!-- Mobile search -->
- <div id="mobile-search">
-   <div style="display:flex; gap:6px; align-items:flex-start;">
-     <div style="flex:2;">
-       <input type="text" id="mobile-city-input" class="form-control input-sm"
-         placeholder="City or ZIP" autocomplete="off"
-         onkeydown="if(event.key==='Enter'){mobileSearch();event.preventDefault();}">
-     </div>
-     <div style="flex:0.6;">
-      <input type="text" id="mobile-state-input" class="form-control input-sm" placeholder="ST" autocomplete="off" maxlength="2"
-         onkeydown="if(event.key==='Enter'){mobileSearch();event.preventDefault();}">
-      </div>
-     <div>
-       <button class="btn btn-danger btn-sm" onclick="mobileSearch()">Search</button>
-     </div>
-   </div>
-   <div id="mobile-search-status"></div>
- </div>
-
-
  <!-- Page Content -->
  <div class="page-wrapper">
    <div class="container-fluid" style="flex:1;display:flex;flex-direction:column;width:100%;">
@@ -286,6 +265,26 @@
            <span id="slices-count">Loading…</span>
          </div>
          <div id="geo-status">Detecting your location…</div>
+
+        <!-- Mobile search -->
+        <div id="mobile-search">
+          <div style="display:flex; gap:6px; align-items:flex-start;">
+            <div style="flex:2;">
+              <input type="text" id="mobile-city-input" class="form-control input-sm"
+                placeholder="City or ZIP" autocomplete="off"
+                onkeydown="if(event.key==='Enter'){mobileSearch();event.preventDefault();}">
+            </div>
+            <div style="flex:0.6;">
+              <input type="text" id="mobile-state-input" class="form-control input-sm" placeholder="ST (opt)" autocomplete="off" maxlength="2"
+                onkeydown="if(event.key==='Enter'){mobileSearch();event.preventDefault();}">
+              </div>
+            <div>
+              <button class="btn btn-danger btn-sm" onclick="mobileSearch()">Search</button>
+            </div>
+          </div>
+          <div id="mobile-search-status"></div>
+        </div>
+
          <div id="map-frame">
            <button id="search-area-btn" onclick="searchThisArea()">🔍 Search this area</button>
          </div>
