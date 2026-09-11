@@ -191,8 +191,6 @@
       </div>
     </div>
 
-    <div id="form-status"></div>
-
     <div class="form-group">
       <label>Website</label>
       <input type="url" id="f-url" class="form-control" value="http://" placeholder="e.g. https://tonyspizzanapoletana.com">
@@ -332,9 +330,9 @@
       const zip     = document.getElementById('f-zip').value.trim();
 
       if (!name || !address || !city || !state || !zip) {
-        statusEl.textContent = '❌ El gato requests to please fill in required fields ';
-        statusEl.style.color = '#c0392b';
-        statusEl.style.fontWeight = 'bold';
+       statusEl.textContent = '❌ El gato requests to please fill in all required fields ';
+       statusEl.style.color = '#c0392b';
+       statusEl.style.fontWeight = 'bold';
         return;
       }
 
