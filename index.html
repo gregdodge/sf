@@ -494,7 +494,7 @@
      var city  = document.getElementById('location-input').value.trim();
      var state = document.getElementById('state-input').value.trim();
      var statusEl = document.getElementById('search-status');
-     if (!city) { statusEl.textContent = 'Squirrel needs a city or ZIP'; statusEl.style.color = '#c0392b'; statusEl.style.fontWeight = 'bold'; return; }
+     if (!city) { statusEl.textContent = '  Squirrel needs a city or ZIP'; statusEl.style.color = '#c0392b'; statusEl.style.fontWeight = 'bold'; return; }
      statusEl.textContent = '';
      geocodeAndPan(city + (state ? ', ' + state : '') + ', USA', statusEl, 'Showing pizza near ' + city);
    }
@@ -795,14 +795,16 @@
          message,
          createdAt: serverTimestamp(),
        });
-       statusEl.textContent = '✅ A squirrel or cat will advise';
+       statusEl.textContent = '  ✅ A squirrel or cat will advise';
        statusEl.style.color = 'green';
+       statusEl.style.fontWeight = 'bold';
        document.getElementById('contact-name').value    = '';
        document.getElementById('contact-email').value   = '';
        document.getElementById('contact-message').value = '';
      } catch(e) {
-       statusEl.textContent = '❌ Could not send. Try again.';
+       statusEl.textContent = '  ❌ Could not send. Try again.';
        statusEl.style.color = '#c0392b';
+       statusEl.style.fontWeight = 'bold';
       console.error('Contact form error:', e);
      }
    };
