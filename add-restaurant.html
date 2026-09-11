@@ -330,8 +330,9 @@
       const zip     = document.getElementById('f-zip').value.trim();
 
       if (!name || !address || !city || !state || !zip) {
-        statusEl.textContent = '❌ El gato requests to please fill in all required fields ';
-        statusEl.style.color = 'red';
+        statusEl.textContent = '❌ El gato requests to please fill in required fields ';
+        statusEl.style.color = '#c0392b';
+        statusEl.style.fontWeight = 'bold';
         return;
       }
 
