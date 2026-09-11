@@ -218,7 +218,7 @@
       + Add Restaurant
     </button>
 
-    <div id="form-status"></div>
+    <div id="form-status" style="text-align: center;"></div>
   </div>
 
   <footer><p>SliceFinder &copy;<script>document.write(new Date().getFullYear())</script></p></footer>
@@ -332,6 +332,7 @@
       if (!name || !address || !city || !state || !zip) {
        statusEl.textContent = '❌ El gato requests to please fill in all required fields ';
        statusEl.style.color = '#c0392b';
+       statusEl.style.fontSize = '18px';
        statusEl.style.fontWeight = 'bold';
         return;
       }
