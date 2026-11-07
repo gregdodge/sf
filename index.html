@@ -18,16 +18,13 @@
    }
    body { display: flex; flex-direction: column; }
 
-
    .container-fluid { padding-left:0; padding-right:0; }
    .row { margin-left:0; margin-right:0; }
    .col-sm-2, .col-sm-8 { padding-left:0; padding-right:0; }
    .col-sm-8 { width:auto; flex:1; }
 
-
    .navbar { margin-bottom:0; border-radius:0; width:100%; flex-shrink:0; }
    .navbar-brand { font-family:'Alfa Slab One',serif; color:#c0392b !important; font-size:24px; letter-spacing:1px; }
-
 
    @media (max-width:767px) {
      #bs-navbar { display:none; width:100%; }
@@ -41,17 +38,13 @@
      #nav-toggle { display:none !important; }
    }
 
-
    .page-wrapper { flex:1; display:flex; flex-direction:column; width:100%; }
    .row.content { flex:1; min-height:600px; display:flex; }
 
-
    .sidenav { padding:20px 14px; background-color:#f1f1f1; }
-
 
    footer { background:#555; color:#fff; padding:15px; text-align:center; flex-shrink:0; }
    footer p { margin:0; }
-
 
    #slices-header {
      background-color:#c0392b; color:#fff;
@@ -62,12 +55,10 @@
    #slices-headline { flex:1; }
    #slices-count { font-size:14px; text-align:right; white-space:nowrap; padding-left:12px; }
 
-
    #geo-status {
      font-size:14px; font-weight:bold; color:#888;
      text-align:center; padding:5px 0; min-height:18px;
    }
-
 
    #map-frame { flex:1; min-height:400px; display:block; z-index:1; }
    #recent-reviews {
@@ -110,7 +101,6 @@
      #recent-reviews .recent-review-card .rr-user { display:none; }
    }
 
-
    .pizza-marker-wrap {
      width:38px; height:38px;
      cursor:pointer;
@@ -125,7 +115,6 @@
      cursor:pointer;
      pointer-events: none;
    }
-
 
    .leaflet-popup-content-wrapper { border-radius:8px; padding:0; overflow:hidden; }
    .leaflet-popup-content { margin:0; min-width:200px; }
@@ -153,7 +142,6 @@
    }
    #mobile-search-status { font-size:11px; color:#888; margin-top:4px; min-height:16px; }
    #search-status { font-size:11px; color:#888; margin-top:4px; min-height:16px; }
-
 
    #search-area-btn {
      position: absolute;
@@ -195,11 +183,9 @@
 </head>
 <body>
 
-
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
 
  <!-- Navigation -->
  <nav class="navbar navbar-inverse">
@@ -230,7 +216,6 @@
    <div class="container-fluid" style="flex:1;display:flex;flex-direction:column;width:100%;">
      <div class="row content">
 
-
        <!-- Left Sidebar -->
        <div class="col-sm-2 sidenav">
          <p>
@@ -246,13 +231,11 @@
            <li style="color:#aaa; font-style:italic;">Loading…</li>
          </ul>
 
-
          <div align="center" style="position:absolute;bottom:50px;">
            <a href="https://gregdodge.github.io/sf/images/dj-gato.gif" style="border:none;"><img src="https://gregdodge.github.io/sf/images/squirrel.jpg" style="width:80%;border:none;"/></a>
          </div>
         
        </div>
-
 
        <!-- Main Content -->
        <div class="col-sm-8" style="display:flex;flex-direction:column;flex:1;">
@@ -291,7 +274,6 @@
            <div class="recent-review-card" style="color:#aaa;font-style:italic;">Loading recent reviews…</div>
          </div>
        </div>
-
 
        <!-- Right Sidebar -->
        <div class="col-sm-2 sidenav">
@@ -348,7 +330,6 @@
 
  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-
  <!-- ── Leaflet map init ─────────────────────────────────────────── -->
  <script>
    var map = L.map('map-frame', {
@@ -357,22 +338,18 @@
      zoomControl: true,
    });
 
-
    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
      maxZoom: 19,
    }).addTo(map);
 
-
    function setGeoStatus(msg) {
      document.getElementById('geo-status').textContent = msg;
    }
 
-
     function setSlicesCount(msg) {
       document.getElementById('slices-count').innerHTML = msg;
     }
-
 
    // Geolocation
    if (navigator.geolocation) {
@@ -388,7 +365,6 @@
      setGeoStatus('Showing pizza near you … Not right? Try search.');
    }
 
-
    // Pizza marker icon
    function makePizzaIcon(highlight) {
      return L.divIcon({
@@ -399,7 +375,6 @@
        popupAnchor: [0, -22],
      });
    }
-
 
    // Geocode an address and place a marker
    function geocodeAndAddMarker(docId, r) {
@@ -419,22 +394,17 @@
        .catch(function(e) { console.warn('Geocode failed:', r.name, e); });
    }
 
-
    window.allMarkers = [];
-
 
    function addMarker(docId, r) {
      if (!r.lat || !r.lng) return;
 
-
      var marker = L.marker([r.lat, r.lng], { icon: makePizzaIcon(false) }).addTo(map);
      marker._restaurantName = (r.name || '').toLowerCase();
-
 
      var tagsHtml = (r.tags || []).map(function(t) {
        return '<span>' + t + '</span>';
      }).join('');
-
 
      var starsHtml = '';
      if (r.avgRating) {
@@ -442,7 +412,6 @@
        var stars = '★'.repeat(full) + '☆'.repeat(5 - full);
        starsHtml = '<div class="popup-stars">' + stars + ' <span style="font-size:11px;color:#888;">(' + r.avgRating.toFixed(1) + ')</span></div>';
      }
-
 
      var popupHtml =
        '<div class="popup-inner">' +
@@ -453,7 +422,6 @@
        (tagsHtml ? '<div class="popup-tags">' + tagsHtml + '</div>' : '') +
        '<a href="restaurant.html?id=' + docId + '" class="popup-btn">View Restaurant →</a>' +
        '</div>';
-
 
      marker.bindPopup(popupHtml, { maxWidth: 240 });
      marker.on('mouseover',  function() { this.setIcon(makePizzaIcon(true)); });
@@ -849,7 +817,6 @@
      btn.href = 'profile.html';
    });
  </script>
-
 
 </body>
 </html>
